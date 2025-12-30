@@ -21,7 +21,20 @@ private:
     // Generate a signature for a word that identifies its anagram group
     string getSignature(const string& word) {
         // TODO: Implement signature generation
-        return "";  // placeholder
+        vector<int> charCount(26, 0);
+        for (char c : word) {
+            charCount[c - 'a']++;
+        }
+        
+        string signature = "";
+        for (int i = 0; i < 26; i++) {
+            if (charCount[i] > 0) {
+                signature += ('a' + i);
+                signature += to_string(charCount[i]);
+            }
+        }
+        
+        return signature;
     }
 
 public:
@@ -29,13 +42,28 @@ public:
     // Returns a vector of groups, where each group is a vector of anagram words
     vector<vector<string>> groupAnagrams(const vector<string>& words) {
         // TODO: Implement anagram grouping using signatures
-        return {};  // placeholder
+        unordered_map<string, vector<string>> signatureMap;
+        
+        for (const string& word : words) {
+            string sig = getSignature(word);
+            signatureMap[sig].push_back(word);
+        }
+        
+        vector<vector<string>> result;
+        for (auto& pair : signatureMap) {
+            result.push_back(pair.second);
+        }
+        
+        return result;
     }
     
     // Check if two words are anagrams
     bool areAnagrams(const string& word1, const string& word2) {
         // TODO: Implement anagram check
-        return false;  // placeholder
+        if (word1.length() != word2.length()) {
+            return false;
+        }
+        return getSignature(word1) == getSignature(word2);
     }
 };
 
