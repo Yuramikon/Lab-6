@@ -39,8 +39,40 @@ private:
     // Returns the index where the key is found, or where it should be inserted
     // If searching, returns -1 if not found
     int probe(int key, bool isSearching) {
-        // TODO: Implement linear probing
-        return -1;  // placeholder
+        int index = hash(key);
+        int startIndex = index;
+        
+        while (true) {
+            if (!occupied[index] && !deleted[index]) {
+                return isSearching ? -1 : index;
+            }
+            
+            if (occupied[index] && table[index].id == key) {
+                return index;
+            }
+            
+            if (deleted[index] && !isSearching) {
+                int deletedPos = index;
+                
+                index = (index + 1) % tableSize;
+                while (index != startIndex) {
+                    if (!occupied[index] && !deleted[index]) {
+                        return deletedPos;
+                    }
+                    if (occupied[index] && table[index].id == key) {
+                        return index;
+                    }
+                    index = (index + 1) % tableSize;
+                }
+                return deletedPos;
+            }
+            
+            index = (index + 1) % tableSize;
+            
+            if (index == startIndex) {
+                return -1;  
+            }
+        }
     }
 
 public:
@@ -54,20 +86,51 @@ public:
     // If student ID already exists, update the record
     void insert(int id, const string& name, double gpa) {
         // TODO: Implement insertion with linear probing
+        int index = probe(id, false);
+        
+        if (index == -1) {
+            cout << "Error: Hash table is full!" << endl;
+            return;
+        }
+        
+        if (occupied[index] && table[index].id == id) {
+            table[index].name = name;
+            table[index].gpa = gpa;
+        } else {
+            table[index] = Student(id, name, gpa);
+            occupied[index] = true;
+            deleted[index] = false;
+            numElements++;
+        }
     }
     
     // Find a student by ID
     // Returns pointer to student if found, nullptr if not found
     Student* find(int id) {
-        // Implement this
-        return nullptr;  // placeholder
+        int index = probe(id, true);
+        
+        if (index == -1) {
+            return nullptr;
+        }
+        
+        return &table[index];
     }
     
     // Remove a student by ID (lazy deletion)
     // Return true if found and removed, false if not found
     bool remove(int id) {
         // TODO: Implement lazy deletion
-        return false;  // placeholder
+        int index = probe(id, true);
+        
+        if (index == -1) {
+            return false;
+        }
+        
+        occupied[index] = false;
+        deleted[index] = true;
+        numElements--;
+        
+        return true;
     }
     
     // Get current load factor
