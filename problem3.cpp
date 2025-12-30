@@ -30,7 +30,13 @@ private:
     // Compute a hash of the file content
     long long hashContent(const string& content) {
         // TODO: Implement content hashing
-        return 0;  // placeholder
+        long long hash = 0;
+        
+        for (char c : content) {
+            hash = (hash + c) % MOD;
+        }
+        
+        return hash;
     }
 
 public:
@@ -38,7 +44,43 @@ public:
     // Returns the number of duplicate groups found
     int findDuplicates(const vector<File>& files) {
         // TODO: Implement duplicate detection using hash map
-        return 0;  // placeholder
+        unordered_map<long long, vector<int>> hashGroups;
+        
+        for (int i = 0; i < files.size(); i++) {
+            long long hash = hashContent(files[i].content);
+            hashGroups[hash].push_back(i);
+        }
+        
+        int duplicateGroups = 0;
+        
+        for (const auto& entry : hashGroups) {
+            const vector<int>& group = entry.second;
+            
+            if (group.size() > 1) {
+                duplicateGroups++;
+                
+                cout << "Duplicate Group " << duplicateGroups << " (hash: " 
+                     << entry.first << "):" << endl;
+                
+                for (int i = 0; i < group.size(); i++) {
+                    cout << "  - " << files[group[i]].name;
+                    
+                    if (i > 0 && verifyDuplicate(files[group[0]], files[group[i]])) {
+                        cout << " [VERIFIED DUPLICATE]";
+                    } else if (i > 0) {
+                        cout << " [HASH COLLISION - NOT DUPLICATE]";
+                    }
+                    cout << endl;
+                }
+                cout << endl;
+            }
+        }
+        
+        if (duplicateGroups == 0) {
+            cout << "No duplicate files found." << endl;
+        }
+        
+        return duplicateGroups;
     }
     
     // Verify if two files are actually duplicates (exact content match)
