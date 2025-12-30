@@ -36,20 +36,47 @@ public:
     // If shortCode already exists, update the longUrl
     void insert(const string& shortCode, const string& longUrl) {
         // Implement this
+        int index = hash(shortCode);
+
+        for (auto& p : table[index]) {
+            if (p.first == shortCode) {
+                p.second = longUrl;  
+                return;
+            }
+        }
+
+        table[index].push_back({shortCode, longUrl});
+        numElements++;
     }
     
     // Find the long URL for a given short code
     // Return empty string if not found
     string find(const string& shortCode) {
         // Implement this
-        return "";  // placeholder
+        int index = hash(shortCode);
+
+        for (const auto& p : table[index]) {
+            if (p.first == shortCode) {
+                return p.second;
+            }
+        }
+        return "";  
     }
     
     // Remove a mapping by short code
     // Return true if found and removed, false if not found
     bool remove(const string& shortCode) {
         // Implement this
-        return false;  // placeholder
+        int index = hash(shortCode);
+
+        for (auto it = table[index].begin(); it != table[index].end(); ++it) {
+            if (it->first == shortCode) {
+                table[index].erase(it);
+                numElements--;
+                return true;
+            }
+        }
+        return false; 
     }
     
     // Get current load factor
