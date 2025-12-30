@@ -21,6 +21,18 @@ public:
     // Time: O(N), Space: O(N)
     pair<int, int> twoSum(const vector<int>& nums, int target) {
         // TODO: Implement using hash map for O(N) solution
+        unordered_map<int, int> seen; 
+        
+        for (int i = 0; i < nums.size(); i++) {
+            int complement = target - nums[i];
+            
+            if (seen.find(complement) != seen.end()) {
+                return {seen[complement], i};
+            }
+            
+            seen[nums[i]] = i;
+        }
+        
         return {-1, -1};  // placeholder
     }
     
@@ -28,7 +40,22 @@ public:
     // Returns a vector of index pairs
     vector<pair<int, int>> twoSumAll(const vector<int>& nums, int target) {
         // TODO: Implement (bonus challenge)
-        return {};  // placeholder
+        vector<pair<int, int>> result;
+        unordered_map<int, vector<int>> seen; 
+        
+        for (int i = 0; i < nums.size(); i++) {
+            int complement = target - nums[i];
+
+            if (seen.find(complement) != seen.end()) {
+                for (int j : seen[complement]) {
+                    result.push_back({j, i});
+                }
+            }
+            
+            seen[nums[i]].push_back(i);
+        }
+        
+        return result;
     }
 };
 
